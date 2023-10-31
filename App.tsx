@@ -1,134 +1,212 @@
-import { useState } from 'react';
-import { Button, Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet, Text, View, Image, TouchableOpacity, Switch
+} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
-export default function App() {
-  const [displayMyQR, setDisplayMyQR] = useState(true);
+type Profile = {
+  name: string;
+  image: any;
+  about: string;
+  likes: string[];
+  github: string;
+  theme: {
+    backgroundColor: string;
+    textColor: string;
+  };
+};
+
+type Profiles = {
+  [key: string]: Profile;
+};
+
+const profiles: Profiles = {
+  persona1: {
+    name: "PABLO",
+    image: require('./assets/Pabloimage.png'),
+    about: "Soy Pablo Vadillo Núñez, me gustan el desarrollo y estoy en proceso de aprender aun más",
+    likes: ["Desarrollo Web", "Videojuegos", "Música"],
+    github: "https://github.com/Pablo-Vadillo",
+    theme: {
+      backgroundColor: '#ffe4e1',
+      textColor: '#b5838d',
+    },
+  },
+  persona2: {
+    name: "SOFIA",
+    image: require('./assets/Sofiaimage.jpg'),
+    about: "Soy Sofia, me gustan las ratas y estoy en proceso de tener más",
+    likes: ["Ratas", "Arte", "Literatura"],
+    github: "https://github.com/Sofiapglez",
+    theme: {
+      backgroundColor: '#ffe4e1',
+      textColor: '#b5838d',
+    },
+  },
+};
+
+export default function PortfolioApp() {
+  const [selectedProfileKey, setSelectedProfileKey] = useState<keyof Profiles>('persona1');
+  const [showLikes, setShowLikes] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const profile = profiles[selectedProfileKey];
+  const theme = darkMode ? {
+    backgroundColor: '#333333',
+    textColor: '#FFFFFF',
+    cardBackgroundColor: '#444444'
+  } : profile.theme;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
-        <Text style={styles.firsttoprowContainer}>My Portfolio App</Text>
-        <View style={styles.rowTopSecondContainer}>
-        <Pressable style={styles.buttonruta} onPress={() => setDisplayMyQR(true)}>
-          <Text style={{...{color: 'white', fontWeight: 'bold', textTransform: 'uppercase'}, ...styles.shadoxboxing}}>Mi info</Text>
-        </Pressable>
-        <Button onPress={() => setDisplayMyQR(false)} title="Mi Repo" color="light-gray" accessibilityLabel='Un botón pal QR' />
+    <View style={[styles.mainContainer, { backgroundColor: theme.backgroundColor }]}>
+      <View style={[styles.headerContainer, styles.headerShadow]}>
+        <Text style={[styles.titleText, { color: theme.textColor }]}>Mi Portafolio</Text>
+        <View style={styles.switchContainer}>
+          <Switch
+            value={darkMode}
+            onValueChange={setDarkMode}
+            thumbColor={darkMode ? "#f5dd4b" : "#f4f3f4"}
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+          />
+          <TouchableOpacity
+            onPress={() => setSelectedProfileKey('persona1')}
+            style={[styles.profileButton, { backgroundColor: theme.backgroundColor }]}
+          >
+            <Text style={{ color: theme.textColor }}>Pablo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSelectedProfileKey('persona2')}
+            style={[styles.profileButton, { backgroundColor: theme.backgroundColor }]}
+          >
+            <Text style={{ color: theme.textColor }}>Sofia</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      {
-        displayMyQR ?
-          <View style={styles.bodystails}>
-            <View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Image style={styles.avatar} source={require('./assets/SofyanAmrabat.jpg')}></Image>
-              <View style={{margin: 10, backgroundColor: 'lightgray', padding: 10, borderRadius: 10, width: '70%'}}>
-            <Text style={{textAlign:'center', fontWeight: '700', fontSize: 20}}>
-            Descripción sobre mí!
-            </Text>
-            <Text>
-              Soy profe y me gusta mi trabajo aunque a veces me de por enrevesar prácticas para mis queridos alumnos
-            </Text>
-              </View>
-              </View>
-            <Text style= {{color: 'beriblak', fontWeight: "900", textTransform: 'capitalize', fontSize: 20, textAlign: 'center'}}>
-              cosas que me gustan mucho:
-            </Text>
-            <ScrollView style={{padding: 10}}>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Salir a pasear</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Senderismo</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Ir a la playita</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Domingos de misa</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>La guitarrita</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>El monte con lluvia</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Viajar</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Música variadita</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Anime</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Ducharme</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Videojuegos</Text>
-              <Text style={styles.cosasQmeGustanMuxoEstails}>Ir de cenar romántica</Text>
-            </ScrollView>
-            </View>
+
+      <View style={[styles.cardContainerStyle, { backgroundColor: theme.backgroundColor}]}>
+        <View style={styles.profileHeader}>
+          <Image style={styles.profileImage} source={profile.image} />
+          <Text style={[styles.profileText, { color: theme.textColor }]}>{profile.name}</Text>
+        </View>
+        <Text style={[styles.profileAbout, { color: theme.textColor }]}>{profile.about}</Text>
+
+        <TouchableOpacity
+          onPress={() => setShowLikes(!showLikes)}
+          style={[styles.likesButton, { backgroundColor: theme.backgroundColor }]}
+        >
+          <Text style={{ color: theme.textColor }}>Ver Gustos</Text>
+        </TouchableOpacity>
+
+        {showLikes && (
+          <View style={styles.likesContainer}>
+            {profile.likes.map((like, index) => (
+              <Text key={index} style={[styles.likeText, { color: theme.textColor }]}>
+                {like}
+              </Text>
+            ))}
           </View>
-          :
-              <View style={styles.bodystails}>
-            <View style={styles.CentrarcodigoQR}>
-          <QRCode value="https://github.com/adhernea" />
-            </View>
-              </View>
-      }
+        )}
+
+        <View style={styles.qrContainer}>
+          <QRCode value={profile.github} />
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 60,
   },
-  topContainer: {
-    height: '15%',
-    paddingTop: 50,
+  headerContainer: {
+    position: 'absolute',
+    top: 0,
+    height: 100,
     width: '100%',
-  },
-  firsttoprowContainer: {
-    backgroundColor: 'gray',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    textAlignVertical: 'center',
-    fontSize: 30,
-  },
-  rowTopSecondContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'darkgray',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  buttonruta: {
-    width:'50%',
-  },
-  bodystails: {
-    width: '100%',
-    borderWidth: 2,
-    borderColor: 'black',
+    backgroundColor: '#f2c0c8',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: '85%'
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingTop: 30,
   },
-  avatar: {
-    height: 90,
-    width: 90,
-    borderRadius: 100
+  headerShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    elevation: 10,
   },
-  cosasQmeGustanMuxoEstails: {
-    borderColor: 'black',
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    padding: 20,
-    color: 'darkred',
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+  },
+  profileButton: {
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    marginRight: 20,
+  },
+  profileText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  profileAbout: {
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  likesButton: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 5,
+  },
+  likesButtonText: {
     textAlign: 'center',
     fontWeight: 'bold',
-    fontStyle: 'italic',
-    fontSize: 16,
-    backgroundColor: 'silver'
   },
-  CentrarcodigoQR: {
+  likesContainer: {
+    marginTop: 10,
+  },
+  likeText: {
+    textAlign: 'center',
+  },
+  qrContainer: {
     justifyContent: 'center',
-    borderWidth: 1,
-    width: '100%',
-    height: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 20,
   },
-  shadoxboxing: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.43,
-    shadowRadius: 9.51,
-
-    elevation: 15,
-  }
+  cardContainerStyle: {
+    width: '80%',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 120,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 10,
+  },
 });
